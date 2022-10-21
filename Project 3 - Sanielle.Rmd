@@ -1,0 +1,46 @@
+---
+title: "project 3"
+author: "Sanielle Worrell"
+date: "2022-10-20"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+jobs <- read.csv("https://raw.githubusercontent.com/johnnydrodriguez/data607_project3/main/glassdoor_2021.csv")
+```
+
+```{r}
+library(dplyr)
+library(stringr)
+library(readr)
+```
+
+
+Rename columns
+```{r}
+jobs <- jobs %>%
+rename("job_title" = 2, "est_salary" = 3, "job_description" = 4, "company" = 6, "ownership" = 11)
+```
+
+Remove duplicates
+```{r}
+jobs_unique <- jobs %>% distinct(job_description,company, .keep_all = TRUE)
+```
+
+
+Clean up commas in data
+```{r}
+jobs_unique$job_description <- gsub("’", "'", jobs_unique$job_description)
+```
+
+Identify keywords
+```{r}
+education <- c("Masters", "Bachelors", "Master's", "Bachelor's", "Phd", "PhD", "Ph.D")
+jobs_unique$education <- mapply(function(x)paste(education[str_detect(x,(education))],
+                                        collapse = ","), jobs_unique$job_description)
+```
+
